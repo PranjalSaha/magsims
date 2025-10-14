@@ -1,0 +1,23 @@
+Satellite Initial Configuration
+--------------------------------
+
+Moment of Inertia:
+[     0.01     0.00     0.00 ]
+[     0.00     0.03     0.00 ]
+[     0.00     0.00     0.03 ]
+
+Initial Orientation Vectors:
+< x \n y \n z >
+[     1.00     0.00     0.00]
+[     0.00     1.00     0.00]
+[     0.00     0.00     1.00]
+
+Initial Angular Velocity: [     0.60     0.60     0.60]
+Initial Angular Acceleration: [     0.00     0.00     0.00]
+
+Magnetic Moment Details:
+Bar Magnet Moment (bar_m): 12.000000
+Hysteresis Rods:
+Volume: 0.000000 m^3
+Demag. Factor: 0.000000
+Number of Rods - X: 3, Y: 3, Z: 0
