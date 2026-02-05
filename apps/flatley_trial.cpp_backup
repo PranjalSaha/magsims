@@ -48,9 +48,9 @@ int main()
         // -- -- -- -- -- //
     */
 
-    double freq = 0.01;         // hertz
+    double freq = 1e-1;         // hertz
     double amp = 100;           // Gauss
-    int num_iterations = 10000;
+    int num_iterations = 1000000;
 
     Vector B;       // Magnetic Field
     Vector H;       // Auxiliary Field

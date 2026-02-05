@@ -1,0 +1,130 @@
+#include <iostream>
+#include <sstream>
+#include <string>
+#include <cmath>
+#include "Vector.h"
+#include "Matrix.h"
+#include "DateTime.h"
+#include "Simulation.h"
+#include "Satellite.h"
+#include "Shell.h"
+using namespace std;
+
+// NOTE: This simulation is used to run so that we are able to debug
+// The Backend of the project.
+// Here the satellite is spinning in a very aligned way with the magnetic field
+// only acting in the z direction.
+// This will allow us to debug the code easily.
+
+int main()
+{
+    // Clearing screen
+    cout << clearScreenString();
+
+    /* NOTE:
+        // -- -- -- -- -- -- -- -- - //
+        // SIMULATION DATA n DETAILS //
+        // -- -- -- -- -- -- -- -- - //
+    */
+
+    string outputCSVFile = "../results/aligned_spin_hiu_10s.csv";
+    string outputDataFile = "../results/aligned_spin_hiu_satellite_info_10s.csv";
+    DateTime start_time("01 Oct 2025 07:00:00.000");
+    DateTime stop_time("01 Oct 2025 08:00:00.000");
+    double timestep = 1;       // in seconds
+
+
+    /* NOTE:
+        // -- -- -- -- -- --- //
+        // HYSTERESIS DETAILS //
+        // -- -- -- -- -- --- //
+   */
+
+    // For PMAC reference paper
+    double H_c = 12;            // Coercivity
+    double B_r = 0.04;          // Retentivity
+    double B_s = 0.27;          // Saturation
+    double q_0 = 0;             // Required for defining flatley loop
+    double p   = 2;             // Required for defining flatley loop
+
+
+    /* NOTE:
+        // -- -- -- -- -- - //
+        // SATELITE DETAILS //
+        // -- -- -- -- -- - //
+    */
+
+    Matrix moment_of_inertia = {
+        0.0067, 0.0000, 0.0000,
+        0.0003, 0.0333, 0.0000,
+        0.0000, 0.0000, 0.0333
+    };
+
+    // Orientation and velicity
+    Vector x = {1, 0, 0};       // Orientation of x axis
+    Vector y = {0, 1, 0};       // Orientation of y axis
+    Vector z = {0, 0, 1};       // Orientation of z axis
+    Vector angular_velocity = {0.0, 0.0, 0.25};
+    Vector angular_acceleration = {0, 0, 0.00001};
+
+    // Data for magnetic moment
+    double bar_m    = 12.00;    // Magnetic moment of bar magnet
+    double hyst_vol = 7.4e-5;   // Volume of one hysteresis rod
+    double hyst_nd  = 0;        // Demagnetising factor (~0 for L/D > 30 E < 2%)
+    int num_x_hyst  = 3;        // --}
+    int num_y_hyst  = 3;        // --}}--number of hysteresis rods
+    int num_z_hyst  = 0;        // --}
+
+
+    /* NOTE:
+        // -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- //
+        // GENAERATING MAG FIELD n SIMULATING SATELLITE //
+        // -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- //
+    */
+
+    SampleDataVector magData;
+    DateTime now = start_time;
+    start_time = start_time + 10;
+    float T = 900;          // Time period in seconds
+    float A = 25;
+    Vector B = {0,0,0};
+    float B_x = 0.0f;
+    float B_y = 0.0f;
+    int num_iterations = (stop_time - start_time)/timestep;
+    for (int i = 0; i < num_iterations; i++){
+        /*
+        B_x = A * sin(2 * 3.1416 * i/ T);
+        B_y = A * sin(2 * 3.1416 * i/ T);
+        B = {B_x, B_y, 0};
+        */
+        B = {A, 0, 0};
+        magData.addSample(start_time + i * timestep, B);
+    }
+    magData.sort();
+
+    // Initialising Satellite
+    cout << "Initialising Satellite..." << endl;
+    Satellite ahan(moment_of_inertia,
+                   x, y, z, angular_velocity, angular_acceleration,
+                   bar_m, hyst_vol, hyst_nd,
+                   num_x_hyst, num_y_hyst, num_z_hyst,
+                   H_c, B_r, B_s, q_0, p);
+    cout << "Initialised Satellite..." << endl
+                                       << endl;
+    cout << "Satellite Parameters : " << endl;
+    ostringstream details;
+    printParams(ahan, details);
+    cout << details.str() << endl;
+
+    // Exporting parameters
+    exportParams(ahan, outputDataFile);
+
+    // Simulating and storing data
+    simulate(ahan, magData, start_time, stop_time, timestep, outputCSVFile,
+             IntegratorType::Euler, 1);
+
+    // Plotting data
+    command("python3 ../utils/plot.py " + outputCSVFile);
+
+    return 0;
+}
