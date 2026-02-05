@@ -12,7 +12,7 @@ class Satellite
 {
 
 private:
-    Matrix moment_of_inertia = {
+    Matrix momentOfInertia = {
         1, 0, 0,
         0, 1, 0,
         0, 0, 1
@@ -21,91 +21,91 @@ private:
     Vector x = {1, 0, 0};       // Orientation of x axis
     Vector y = {0, 1, 0};       // Orientation of y axis
     Vector z = {0, 0, 1};       // Orientation of z axis
-    Vector angular_velocity = {1, 0, 0};
-    Vector angular_acceleration = {1, 0, 0};
+    Vector angularVelocity = {1, 0, 0};
+    Vector angularAcceleration = {1, 0, 0};
 
     // Magnetic moments ...
-    double bar_m = 0.1;         // Mag-mom of bar magnet
-    Vector bar_dir = {0,0,1};   // Direction of bar magnet
-    double hyst_vol = 1.0;      // Volume of hysteress rod
-    double hyst_nd = 30;
+    double barM = 0.1;          // Mag-mom of bar magnet
+    Vector barDir = {0,0,1};    // Direction of bar magnet
+    double hystVol = 1.0;       // Volume of hysteress rod
+    double hystNd = 30;
 
     // number of hysteresis rods
-    int num_x_hyst = 0;
-    int num_y_hyst = 0;
-    int num_z_hyst = 0;
-    Flatley hyst_x;
-    Flatley hyst_y;
-    Flatley hyst_z;
-    double hyst_m_x = 0.0,        // ... of hysteresis rods in x direction
-           hyst_m_y = 0.0,        // ... of hysteresis rods in y direction
-           hyst_m_z = 0.0;        // ... of hysteresis rods in z direction
+    int numXHyst = 0;
+    int numYHyst = 0;
+    int numZHyst = 0;
+    Flatley hystX;
+    Flatley hystY;
+    Flatley hystZ;
+    double hystMX = 0.0,        // ... of hysteresis rods in x direction
+           hystMY = 0.0,        // ... of hysteresis rods in y direction
+           hystMZ = 0.0;        // ... of hysteresis rods in z direction
 
 public:
     // Constructor
     Satellite();
-    Satellite(Matrix in_MOI,
-              Vector in_x,
-              Vector in_y,
-              Vector in_z,
-              Vector in_omega,
-              Vector in_alpha,
-              double in_bar_m,
-              double in_hyst_vol,
-              double in_hyst_nd,
-              int in_num_x_hyst,
-              int in_num_y_hyst,
-              int in_num_z_hyst,
-              double H_c,
-              double B_r,
-              double B_s,
-              double q_0,
+    Satellite(Matrix inMOI,
+              Vector inX,
+              Vector inY,
+              Vector inZ,
+              Vector inOmega,
+              Vector inAlpha,
+              double inBarM,
+              double inHystVol,
+              double inHystNd,
+              int inNumXHyst,
+              int inNumYHyst,
+              int inNumZHyst,
+              double hC,
+              double bR,
+              double bS,
+              double q0,
               double p);
 
     // Modifiers
-    void set_moment_of_inertia(Matrix MOI);
-    void set_orientation(Vector X, Vector Y, Vector Z);
-    void set_angular_velocity(Vector omega);
-    void set_angular_acceleration(Vector alpha);
+    void setMomentOfInertia(Matrix MOI);
+    void setOrientation(Vector X, Vector Y, Vector Z);
+    void setAngularVelocity(Vector omega);
+    void setAngularAcceleration(Vector alpha);
 
-    void set_bar_m(double m);
-    void set_num_x_hyst(int h);
-    void set_num_y_hyst(int h);
-    void set_num_z_hyst(int h);
+    void setBarM(double m);
+    void setNumXHyst(int h);
+    void setNumYHyst(int h);
+    void setNumZHyst(int h);
 
-    void set_hyst_curve(double H_c,
-                        double B_r,
-                        double B_s,
-                        double q_0,
-                        double p);
+    void setHystCurve(double hC,
+                      double bR,
+                      double bS,
+                      double q0,
+                      double p);
 
     // Update the hystersis values
-    void update_hyst_m(Vector H, double timestep);
+    void updateHystM(Vector H, double timestep);
 
     // Accessors
-    Matrix get_moment_of_inertia() const;
-    vector<Vector> get_orientation() const;
-    Vector get_angular_velocity() const;
-    Vector get_angular_acceleration() const;
+    Matrix getMomentOfInertia() const;
+    vector<Vector> getOrientation() const;
+    Vector getAngularVelocity() const;
+    Vector getAngularAcceleration() const;
 
-    double get_bar_m() const;
-    Vector get_hyst_b() const;
-    Vector get_hyst_m() const;
-    double get_hyst_vol() const;
-    double get_hyst_nd() const;
-    Vector get_net_m() const;
-    int get_num_x_hyst() const;
-    int get_num_y_hyst() const;
-    int get_num_z_hyst() const;
+    double getBarM() const;
+    Vector getHystB() const;
+    Vector getHystM() const;
+    double getHystVol() const;
+    double getHystNd() const;
+    Vector getNetM() const;
+    int getNumXHyst() const;
+    int getNumYHyst() const;
+    int getNumZHyst() const;
 
     // Displayers
-    string display_moment_of_inertia() const;
-    string display_orientation() const;
-    string display_angular_velocity() const;
-    string display_angular_acceleration() const;
+    string displayMomentOfInertia() const;
+    string displayOrientation() const;
+    string displayAngularVelocity() const;
+    string displayAngularAcceleration() const;
 
     // Function to apply torque on the satellite
-    void apply_torque(Vector torque, double timestep);
+    void applyTorque(Vector torque, double timestep);
 };
 
 #endif

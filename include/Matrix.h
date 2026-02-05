@@ -40,7 +40,7 @@ public:
 
 private:
 
-    void check_bounds(size_t row, size_t col) const;
+    void checkBounds(size_t row, size_t col) const;
 
     vector<double> data;
 };

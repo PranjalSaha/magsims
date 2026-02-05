@@ -7,11 +7,12 @@ using namespace std;
 
 struct DateTime
 {
-    // Constructor
+    // Constructors
+    DateTime();
     DateTime(const std::string &time_str);
 
     // Accessor
-    std::string to_string() const;
+    std::string toString() const;
 
     // Comparison operators
     bool operator<(const DateTime &other) const;
@@ -20,6 +21,8 @@ struct DateTime
 
     // Difference in seconds
     double operator-(const DateTime &other) const;
+    // Add time to operator
+    DateTime operator+(const double seconds) const;
 
     // returns time as a string
     string display() const;
@@ -28,7 +31,7 @@ private:
     std::chrono::system_clock::time_point tp;
 
     static std::chrono::system_clock::time_point 
-        parse_datetime(const std::string &time_str);
+        parseDateTime(const std::string &time_str);
 };
 
 #endif

@@ -13,7 +13,7 @@ class Vector
 private:
     vector<double> data;
 
-    void check_bounds(size_t index) const;
+    void checkBounds(size_t index) const;
 
 public:
     // Constructors
