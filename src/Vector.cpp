@@ -6,7 +6,7 @@
 #include <cmath>
 using namespace std;
 
-void Vector::check_bounds(size_t index) const
+void Vector::checkBounds(size_t index) const
 {
     if (index >= 3)
         throw out_of_range(
@@ -35,19 +35,19 @@ Vector::Vector(initializer_list<double> values)
 
 double& Vector::operator[](size_t index)
 {
-    check_bounds(index);
+    checkBounds(index);
     return data[index];
 }
 
 const double& Vector::operator[](size_t index) const
 {
-    check_bounds(index);
+    checkBounds(index);
     return data[index];
 }
 
 double Vector::at(size_t index) const
 {
-    check_bounds(index);
+    checkBounds(index);
     return data[index];
 }
 

@@ -1,18 +1,21 @@
+#!/bin/python3
+
 import pickle
 import matplotlib.pyplot as plt
 import pandas as pd
 import os
 from tkinter import Tk, filedialog
+from matplotlib.figure import Figure
+from matplotlib._pylab_helpers import Gcf
 
 
 def choose_file():
     root = Tk()
-    root.withdraw()  # Hide the main Tkinter window
-    file_path = filedialog.askopenfilename(
+    root.withdraw()
+    return filedialog.askopenfilename(
         title="Select a Pickled File",
         filetypes=[("Pickle files", "*.pkl"), ("All files", "*.*")]
     )
-    return file_path
 
 
 def plot_pickled_file():
@@ -30,18 +33,25 @@ def plot_pickled_file():
         with open(filename, 'rb') as f:
             data = pickle.load(f)
 
+        # --- CASE 1: Pickled Matplotlib Figure ---
+        if isinstance(data, Figure):
+            print("Detected pickled Matplotlib figure.")
+            Gcf.set_active(data.canvas.manager)
+            plt.show()
+            return
+
+        # --- CASE 2: Pandas DataFrame ---
         if isinstance(data, pd.DataFrame):
-            df = data
-            if df.shape[1] < 2:
+            if data.shape[1] < 2:
                 print("DataFrame must have at least two columns.")
                 return
 
-            columns = df.columns.tolist()
-            x = df[columns[0]]
+            columns = data.columns.tolist()
+            x = data[columns[0]]
 
             plt.figure(figsize=(10, 6))
             for col in columns[1:]:
-                plt.plot(x, df[col], label=col)
+                plt.plot(x, data[col], label=col)
 
             plt.xlabel(columns[0])
             plt.ylabel("Values")
@@ -50,31 +60,37 @@ def plot_pickled_file():
             plt.grid(True)
             plt.tight_layout()
             plt.show()
+            return
 
-        elif isinstance(data, dict):
+        # --- CASE 3: Dictionary of sequences ---
+        if isinstance(data, dict):
             plt.figure(figsize=(10, 6))
             for key, values in data.items():
                 if isinstance(values, (list, pd.Series)):
                     plt.plot(values, label=str(key))
                 else:
-                    print(f"Skipping key '{key}': unsupported data type.")
+                    print(f"Skipping key '{key}': unsupported type")
+
             plt.title(f"Graph from {os.path.basename(filename)}")
             plt.legend()
             plt.grid(True)
             plt.tight_layout()
             plt.show()
+            return
 
-        elif isinstance(data, list):
+        # --- CASE 4: List ---
+        if isinstance(data, list):
             plt.figure(figsize=(10, 6))
-            plt.plot(data, label='List Data')
+            plt.plot(data, label="List Data")
             plt.title(f"Graph from {os.path.basename(filename)}")
             plt.legend()
             plt.grid(True)
             plt.tight_layout()
             plt.show()
+            return
 
-        else:
-            print(f"Unsupported data type: {type(data)}")
+        # --- FALLBACK ---
+        print(f"Unsupported pickled type: {type(data)}")
 
     except Exception as e:
         print(f"An error occurred: {e}")

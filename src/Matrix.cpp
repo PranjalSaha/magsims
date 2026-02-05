@@ -23,14 +23,14 @@ Matrix::Matrix(initializer_list<double> values)
 
 double& Matrix::operator()(size_t row, size_t col)
 {
-    check_bounds(row, col);
+    checkBounds(row, col);
     return data[row * 3 + col];
 }
 
 
 const double& Matrix::operator()(size_t row, size_t col) const
 {
-    check_bounds(row, col);
+    checkBounds(row, col);
     return data[row * 3 + col];
 }
 
@@ -50,7 +50,7 @@ size_t Matrix::size() const
 }
 
 
-void Matrix::check_bounds(size_t row, size_t col) const
+void Matrix::checkBounds(size_t row, size_t col) const
 {
     if (row >= 3 || col >= 3)
         throw out_of_range("Matrix indices out of bounds");

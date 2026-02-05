@@ -1,42 +1,45 @@
+#!/bin/python3
+
+# import matplotlib as mpl
 import pandas as pd
 import matplotlib.pyplot as plt
 import sys
-import pickle
 
 # Load the CSV file
 file = sys.argv[1]
-df = pd.read_csv(file)
 
-# === Hysteresis Curve ===
-fig_hysteresis, ax1 = plt.subplots(figsize=(12, 6))
+# Fix for Agg OverflowError
+# mpl.rcParams["agg.path.chunksize"] = 10000
 
-ax1.plot(df['H(A/m)'], df['B(T)'])
 
-ax1.set_xlabel("H")
-ax1.set_ylabel("B")
-ax1.set_title("Hysteresis curve")
-ax1.legend()
-ax1.grid(True)
+def plotBH(csvFile):
+    data = pd.read_csv(csvFile)
 
-# Save the figure
-with open("../results/hysteresis_trial.pkl", "wb") as f:
-    pickle.dump(fig_hysteresis, f)
+    sno = data.iloc[:, 0]
+    H = data.iloc[:, 1]
+    B = data.iloc[:, 2]
 
-# === Hysteresis Curve ===
-fig_hysteresis_info, ax2 = plt.subplots(figsize=(12, 6))
+    # -------- Plot 1: B(T) vs H(A/m) --------
+    plt.figure()
+    plt.plot(H, B)
+    plt.xlabel("H (A/m)")
+    plt.ylabel("B (T)")
+    plt.title("B vs H")
+    plt.grid(True)
 
-ax2.plot(df['S.No'], df['H(A/m)'])
-ax2.plot(df['S.No'], df['B(T)'])
-ax2.plot(df['S.No'], df['slope'])
+    # -------- Plot 2: H(A/m) and B(T) vs S.No --------
+    plt.figure()
+    plt.plot(sno, H, label="H (A/m)")
+    plt.plot(sno, B, label="B (T)")
+    plt.xlabel("S.No")
+    plt.ylabel("H (A/m) and B (T)")
+    plt.title("H and B vs S.No")
+    plt.legend()
+    plt.grid(True)
 
-ax2.set_xlabel("Iteration")
-ax2.set_title("Hysteresis info")
-ax2.legend()
-ax2.grid(True)
+    # plotting all graphs together
+    plt.show()
 
-# Save the figure
-with open("../results/hysteresis_info.pkl", "wb") as f:
-    pickle.dump(fig_hysteresis_info, f)
 
-plt.tight_layout()
-plt.show()
+if __name__ == "__main__":
+    plotBH(file)

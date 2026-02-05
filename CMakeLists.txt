@@ -1,51 +1,83 @@
 cmake_minimum_required(VERSION 3.10)
 
+# --------------------------------------------------------------
+# Adding Option to Enable Sanitizers
+# --------------------------------------------------------------
+
+option(ENABLE_SANITIZERS "Enable address/undefined sanitizers" OFF)
+# to build sanitized version
+# cmake -S . -B build-sanitized -DENABLE_SANITIZERS=ON
+# cmake --build build-sanitized
+
+# --------------------------------------------------------------
 # Project definition
+# --------------------------------------------------------------
 project(Magnetic_Simulation LANGUAGES CXX)
 
-# Set C++ standard (C++17)
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED OFF)
+if (ENABLE_SANITIZERS)
+    if (CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
+        add_compile_options(
+            -fsanitize=address,undefined
+            -fno-omit-frame-pointer
+            -g
+            -O0
+        )
 
-# Export compile_commands.json (useful for IDEs, static analyzers, clangd)
+        add_link_options(
+            -fsanitize=address,undefined
+        )
+    else()
+        message(WARNING "Sanitizers not supported for this compiler")
+    endif()
+endif()
+
+# C++ standard
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+# Export compile_commands.json (clangd, IDEs)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # --------------------------------------------------------------
-# Build the common library
+# Library target (non-template implementation files only)
 # --------------------------------------------------------------
 
-# Collect all .cpp files in src/ (implementation files, no main())
-file(GLOB SRC_FILES src/*.cpp)
+# Collect all implementation files (no main())
+file(GLOB SRC_FILES
+    ${CMAKE_SOURCE_DIR}/src/*.cpp
+)
 
-# Create a library target with those files
-add_library(myproject_lib ${SRC_FILES})
+add_library(magnetic_simulation_lib ${SRC_FILES})
 
-# Add include/ as a public header search path
-target_include_directories(myproject_lib PUBLIC include)
+# Public include path (headers + .tpp live here)
+target_include_directories(magnetic_simulation_lib
+    PUBLIC
+        ${CMAKE_SOURCE_DIR}/include
+)
 
 # --------------------------------------------------------------
-# Build executables from apps/
+# Executables (each file in apps/ has its own main)
 # --------------------------------------------------------------
 
-# Collect all application sources (each has its own main())
-file(GLOB APPS ${CMAKE_SOURCE_DIR}/apps/*.cpp)
+file(GLOB APP_FILES
+    ${CMAKE_SOURCE_DIR}/apps/*.cpp
+)
 
-# Create one executable per file in apps/
-foreach(APP_FILE ${APPS})
-    # Extract the filename without extension (e.g., main1.cpp -> main1)
+foreach(APP_FILE ${APP_FILES})
     get_filename_component(EXE_NAME ${APP_FILE} NAME_WE)
-
-    # Append ".out" to the executable name
     set(EXE_NAME "${EXE_NAME}.out")
 
-    # Define the executable
     add_executable(${EXE_NAME} ${APP_FILE})
 
-    # Link with the shared project library
-    target_link_libraries(${EXE_NAME} PRIVATE myproject_lib)
+    target_link_libraries(${EXE_NAME}
+        PRIVATE
+            magnetic_simulation_lib
+    )
 
-    # Place executables in ../bin/
-    set_target_properties(${EXE_NAME} PROPERTIES
-        RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin
+    set_target_properties(${EXE_NAME}
+        PROPERTIES
+            RUNTIME_OUTPUT_DIRECTORY
+                ${CMAKE_SOURCE_DIR}/bin
     )
 endforeach()
